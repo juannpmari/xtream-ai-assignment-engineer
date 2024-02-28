@@ -1,34 +1,63 @@
-from typing import Any
+# from typing import Any
 import pandas as pd
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.model_selection import train_test_split
+from pathlib import Path
+
+
 
 class Preprocessing():
     
     def __init__(self) -> None:
         self.data_path = './datasets/diamonds/diamonds.csv'
         self.output_path = './datasets/diamonds/processed_data'
+
+        #Could be static @property. Se podría leer desde un config.json para que sea más dinámico
+        self.categorical_variables = {
+            'cut':[['Ideal', 'Premium', 'Very Good', 'Good', 'Fair']],
+            'color':[['D','E','F','G','H','I','J']],
+            'clarity':[['IF','VVS1', 'VVS2','VS1','VS2','SI1','SI2','I1']]
+        }
     
     def load_data(self):
         self.diamonds_df = pd.read_csv(self.data_path)
+
+    def data_validation(self):
+        '''All numerical magnitudes represent physical properties of the diamond, so must be > 0'''
+        numeric_columns = self.diamonds_df.select_dtypes(include='number')
+        self.diamonds_df = self.diamonds_df[(numeric_columns > 0).all(axis=1)]
 
     def remove_outliers(self):
         pass
 
     def encode_data(self):
-        pass
+        for k,v in self.categorical_variables.items():
+            encoder = OrdinalEncoder(categories=v)
+            self.diamonds_df[k]  = encoder.fit_transform(self.diamonds_df[k].values.reshape(-1, 1))
 
     def scale_data(self):
+        '''Not necessary for regression trees'''
         pass
 
     def split_data(self):
-        #save data to self.output_path
-        pass
+        '''Save data to self.output_path'''
+        X = self.diamonds_df.drop(columns=['price'])  # Features
+        y = self.diamonds_df['price']  # Target variable
+
+        # Split the data into train and test sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        X_train.to_csv(Path(self.output_path,'X_train.csv'), index=False)
+        X_test.to_csv(Path(self.output_path,'X_test.csv'), index=False)
+        y_train.to_csv(Path(self.output_path,'y_train.csv'), index=False)
+        y_test.to_csv(Path(self.output_path,'y_test.csv'), index=False)
 
     def __call__(self):
         self.load_data()
-        self.remove_outliers()
+        self.data_validation()
         self.encode_data()
         self.split_data()
-        self.scale_data()
+        # self.scale_data()
 
 if __name__ == "__main__":
     Preprocessing()
