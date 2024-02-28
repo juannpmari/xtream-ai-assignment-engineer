@@ -3,14 +3,15 @@ import pandas as pd
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.model_selection import train_test_split
 from pathlib import Path
+import os
 
 
 
 class Preprocessing():
     
     def __init__(self) -> None:
-        self.data_path = './datasets/diamonds/diamonds.csv'
-        self.output_path = './datasets/diamonds/processed_data'
+        self.data_path = '/datasets/diamonds/diamonds.csv'
+        self.output_path = '/datasets/diamonds/processed_data'
 
         #Could be static @property. Se podría leer desde un config.json para que sea más dinámico
         self.categorical_variables = {
@@ -47,6 +48,8 @@ class Preprocessing():
         # Split the data into train and test sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+        os.makedirs(self.output_path,exist_ok=True)
+
         X_train.to_csv(Path(self.output_path,'X_train.csv'), index=False)
         X_test.to_csv(Path(self.output_path,'X_test.csv'), index=False)
         y_train.to_csv(Path(self.output_path,'y_train.csv'), index=False)
@@ -60,7 +63,7 @@ class Preprocessing():
         # self.scale_data()
 
 if __name__ == "__main__":
-    Preprocessing()
+    Preprocessing()()
 
 
 

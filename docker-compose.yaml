@@ -1,0 +1,18 @@
+
+services:
+  preprocessing:
+    image: preprocessing:latest
+    container_name: preprocessing
+    volumes:
+      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/datasets:/datasets
+    command: tail -f /dev/null
+
+  # training:
+  #   image: training:latest
+  #   container_name: training
+  #   volumes:
+  #     - ./datasets:./datasets
+  #     - model_registry:model_registry
+  #   command: tail -f /dev/null
+
+
