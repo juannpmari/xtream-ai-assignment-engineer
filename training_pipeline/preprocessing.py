@@ -7,7 +7,7 @@ import os
 
 
 
-class Preprocessing():
+class Preprocessor():
     
     def __init__(self) -> None:
         self.data_path = '/datasets/diamonds/diamonds.csv'
@@ -62,8 +62,8 @@ class Preprocessing():
         self.split_data()
         # self.scale_data()
 
-if __name__ == "__main__":
-    Preprocessing()()
+# if __name__ == "__main__":
+#     Preprocessor()()
 
 
 

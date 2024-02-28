@@ -7,12 +7,19 @@ services:
       - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/datasets:/datasets
     command: tail -f /dev/null
 
-  # training:
-  #   image: training:latest
-  #   container_name: training
-  #   volumes:
-  #     - ./datasets:./datasets
-  #     - model_registry:model_registry
-  #   command: tail -f /dev/null
+  training:
+    image: training:latest
+    container_name: training
+    volumes:
+      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/datasets:/datasets
+      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/model_registry:/model_registry
+    command: tail -f /dev/null
 
+  training-pipeline:
+    image: training_pipeline:latest
+    container_name: training_pipeline
+    volumes:
+      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/datasets:/datasets
+      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/model_registry:/model_registry
+    command: tail -f /dev/null
 
