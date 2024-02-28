@@ -1,0 +1,8 @@
+
+services:
+  preprocessing:
+    image: preprocessing:latest
+    container_name: preprocessing
+    volumes:
+      -./datasets:./datasets
+
