@@ -1,6 +1,6 @@
 notas.txt
 *.pt
-*.png
+*_tree.png
 .*pkl
 
 # Byte-compiled / optimized / DLL files
