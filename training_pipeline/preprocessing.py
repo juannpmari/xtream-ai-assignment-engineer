@@ -10,8 +10,9 @@ import logging
 
 class Preprocessor():
     
-    def __init__(self) -> None:
+    def __init__(self,config):
         logging.info("Initializing preprocessor")
+        self.config = config
         self.data_path = '/datasets/diamonds/diamonds.csv'
 
         self.current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
@@ -19,11 +20,12 @@ class Preprocessor():
         os.makedirs(self.output_path,exist_ok=True)
 
         #Could be static @property. Se podría leer desde un config.json para que sea más dinámico
-        self.categorical_variables = {
-            'cut':[['Ideal', 'Premium', 'Very Good', 'Good', 'Fair']],
-            'color':[['D','E','F','G','H','I','J']],
-            'clarity':[['IF','VVS1', 'VVS2','VS1','VS2','SI1','SI2','I1']]
-        }
+        self.categorical_variables = config['categorical_variables']
+        # {
+        #     'cut':[['Ideal', 'Premium', 'Very Good', 'Good', 'Fair']],
+        #     'color':[['D','E','F','G','H','I','J']],
+        #     'clarity':[['IF','VVS1', 'VVS2','VS1','VS2','SI1','SI2','I1']]
+        # }
     
     def load_data(self):
         self.diamonds_df = pd.read_csv(self.data_path)

@@ -1,6 +1,9 @@
+import json
 from preprocessing import Preprocessor
 from training import Trainer
 
 if __name__=="__main__":
-    current_time = Preprocessor()()
+    config_path = 'config.json'
+    config = json.load(config_path)
+    current_time = Preprocessor(config)()
     Trainer(current_time)()
