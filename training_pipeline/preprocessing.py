@@ -1,17 +1,22 @@
-# from typing import Any
 import pandas as pd
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.model_selection import train_test_split
 from pathlib import Path
+from datetime import datetime
 import os
+import logging
 
 
 
 class Preprocessor():
     
     def __init__(self) -> None:
+        logging.info("Initializing preprocessor")
         self.data_path = '/datasets/diamonds/diamonds.csv'
-        self.output_path = '/datasets/diamonds/processed_data'
+
+        self.current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        self.output_path = f'/datasets/diamonds/processed_data/data_{self.current_time}'
+        os.makedirs(self.output_path,exist_ok=True)
 
         #Could be static @property. Se podría leer desde un config.json para que sea más dinámico
         self.categorical_variables = {
@@ -48,18 +53,20 @@ class Preprocessor():
         # Split the data into train and test sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        os.makedirs(self.output_path,exist_ok=True)
 
-        X_train.to_csv(Path(self.output_path,'X_train.csv'), index=False)
-        X_test.to_csv(Path(self.output_path,'X_test.csv'), index=False)
-        y_train.to_csv(Path(self.output_path,'y_train.csv'), index=False)
-        y_test.to_csv(Path(self.output_path,'y_test.csv'), index=False)
+        X_train.to_csv(Path(self.output_path,f'X_train.csv'), index=False)
+        X_test.to_csv(Path(self.output_path,f'X_test.csv'), index=False)
+        y_train.to_csv(Path(self.output_path,f'y_train.csv'), index=False)
+        y_test.to_csv(Path(self.output_path,f'y_test.csv'), index=False)
+
+        return self.current_time
 
     def __call__(self):
         self.load_data()
         self.data_validation()
         self.encode_data()
-        self.split_data()
+        current_time = self.split_data()
+        return current_time
         # self.scale_data()
 
 # if __name__ == "__main__":

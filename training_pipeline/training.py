@@ -10,18 +10,21 @@ from sklearn.metrics import mean_squared_error,mean_absolute_error
 
 class Trainer():
    
-    def __init__(self):
-        self.data_path = '/datasets/diamonds/processed_data'
+    def __init__(self,current_time):
+        self.data_path = f'/datasets/diamonds/processed_data/data_{current_time}'
         self.model_output_path = '/model_registry'
+        self.metrics_output_path = '/metrics'
         os.makedirs(self.model_output_path,exist_ok=True)
+        os.makedirs(self.metrics_output_path,exist_ok=True)
         self.tree_reg = DecisionTreeRegressor()  # You can adjust the max_depth parameter to control the tree depth
+        self.current_time = current_time
 
     def load_data(self):
         logging.info("Loading data")
-        self.X_train = pd.read_csv(Path(self.data_path,'X_train.csv'))
-        self.y_train = pd.read_csv(Path(self.data_path,'y_train.csv'))
-        self.X_test = pd.read_csv(Path(self.data_path,'X_test.csv'))
-        self.y_test = pd.read_csv(Path(self.data_path,'y_test.csv'))
+        self.X_train = pd.read_csv(Path(self.data_path,f'X_train.csv'))
+        self.y_train = pd.read_csv(Path(self.data_path,f'y_train.csv'))
+        self.X_test = pd.read_csv(Path(self.data_path,f'X_test.csv'))
+        self.y_test = pd.read_csv(Path(self.data_path,f'y_test.csv'))
 
     # Initialize the DecisionTreeRegressor
 
@@ -31,7 +34,7 @@ class Trainer():
         ''' Train the model'''
         logging.info("Training model")
         self.tree_reg.fit(self.X_train, self.y_train)
-        joblib.dump(self.tree_reg, Path(self.model_output_path,'tree_reg_model.pt'))
+        joblib.dump(self.tree_reg, Path(self.model_output_path,f'tree_reg_model_{self.current_time}.pt'))
 
     def evaluate(self):
         logging.info("Performing offline evaluation")
@@ -42,7 +45,7 @@ class Trainer():
         # Evaluate the model
         mse = mean_absolute_error(self.y_test, y_pred)
 
-        with open(Path(self.model_output_path,'metrics.txt'),'w+') as file:
+        with open(Path(self.metrics_output_path,f'metrics_{self.current_time}.txt'),'w+') as file:
             file.write(f"mae: {mse}")
         logging.info("Mean absolute Error:", mse)
 

@@ -2,6 +2,7 @@ notas.txt
 *.pt
 *_tree.png
 .*pkl
+/datasets
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
