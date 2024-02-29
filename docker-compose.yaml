@@ -22,6 +22,7 @@ services:
       - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/datasets:/datasets
       - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/model_registry:/model_registry
       - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/metrics:/metrics
+      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/config.json:/app/config.json
 
     command: tail -f /dev/null
 

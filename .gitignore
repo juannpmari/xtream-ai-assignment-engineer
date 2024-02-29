@@ -3,6 +3,9 @@ notas.txt
 *_tree.png
 .*pkl
 /datasets
+/metrics
+/model_registry
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
