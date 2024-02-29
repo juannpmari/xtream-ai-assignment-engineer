@@ -1,0 +1,40 @@
+Usar: pandas, scikit-learn, and numpy. python y pytorch
+
+Parte 1: He's looking for a **model that predicts a gem's worth based on its characteristics**. And, because Francesco's clientele is as demanding as he is, he wants the why behind every price tag.
+crear una jupyter notebook que tiene los siguientes apartados:
+    - análisis y procesamiento del dataset: 
+        - ver características estadísticas (normalidad de los features, etc.). Analizar max-min de cada feature para ver si hace falta escalarlas
+        - cómo procesar variables categóricas, etc.
+        - Check for missing values, outliers, and any inconsistencies in the data
+        - EDA: analizar relaciones entre variables
+        - Feature selection: puedo probar algún método para ver si alguna de las variables no tiene relevancia
+        - train/val/test split
+    - entrenamiento: 
+        - al elegir un modelo, chequear que los supuestos (normalidad de los features, etc.) se cumplan. Buscar un modelo que sea interpretable (reg lineal o arbol de reg)
+        - idea: puedo entrenar una regresión lineal (dejando solo las variables que cumplen los supuestos) y un arbol de decisión (con todas las variables porque no tiene supuestos), y ver cual funciona mejor
+    - evaluación del modelo
+
+Parte 2: **Develop an automated pipeline** that trains your model with fresh data. Entiendo que es basicamente rehacer la notebook en forma de pipeline automatizado
+    - opcion 1: Tomar parte de la data de train de la parte 1 para simular la fresh data
+    - opcion 2: tomar todo el train set como fresh data, es decir, rehacer la notebook en forma de pipeline automatizado (mejor opción)
+    - definir un trigger del pipeline: en principio puede ser por tiempo. Puedo dejarlo que mire cada x tiempo (1 hora?) y si hay un nuevo csv, ejecuta el pipeline.
+        Cada csv debería tener la fecha y hora en el nombre, y puedo hacer el que el pipeline vaya anotando en un archivo los que ya procesó
+            -   puedo aclarar que como desarrollo más avanzado se puede hacer por caida de performance (data shift), etc -> ver libro
+    - puedo hacer que cada ejecución del pipeline entre un modelo from scratch (stateless), y aclarar que se podría hacer stateful (ver si es posible para reg lineal)
+    - debería dockerizarlo, definiendo el bind mount de lectura de la data (simulando un data lake) y el de salida del model (simulando un model registry)
+    - agregar fase de offline evaluation (en el mismo test set que parte 1), y sugerir opciones de online evaluation para ver si se despliega o no
+    - puedo agregar un comentario de cómo se puede monitorear con un ml design pattern (ver libro ml design patterns)
+    - puedo agregar, o comentar cómo agregaría, un paso de data validation (por ej., chequear que estén todas las filas o que sean todos valores positivos)
+    - agregar esquema del pipeline: https://app.diagrams.net/#G1gmZ3YlDl32vD41DV_lWdHVxxzgFUMnaP#%7B%22pageId%22%3A%22qn1Lafk8GhiB_ouayzCs%22%7D
+    - en algún momento se puede separar en varios contenedores y orchestrarlos con airflow
+
+Parte 3: **Build a REST API** to integrate your model into a web app, making it a cinch for his team to use. Keep it developer-friendly – after all, not everyone speaks 'data scientist'!
+    - sería para deployar el modelo. Deberia ser un docker que levante el modelo del bind mount que representa el docker registry
+        - se puede hacer el deployment con pytorch?
+    - entiendo que no haría falta la web. Quizá crearla con fastapi para tener una cierta ui
+
+Parte 4: Using your favorite cloud provider, either AWS, GCP, or Azure, design cloud-based training and serving pipelines. You should not implement the solution, but you should provide a detailed explanation of the architecture and the services you would use, motivating your choices.
+
+
+Puedo hacer un rama para cada parte. Pensar bien los mensajes de los commits. Hacer pequeños commits y frecuentes. Puedo tagear el commit final de cada rama como 'release' o similar.
+ver si convienve mergear todas las ramas en main, creo que sí para que sea más fácil la lectura

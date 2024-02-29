@@ -83,3 +83,12 @@ So, ready to add some sparkle to this challenge? Let's make these diamonds shine
 
 ## How to run
 Please fill this section as part of the assignment.
+
+
+#### Challenge 3
+A RESTful API was created using FastAPI. It loads the latest model from the local directory 'model_registry', and deploys it for inference using PyTorch.
+It's exposes two endpoints:
+* endpoint '/predict': processes one input at a time, so it can be used for real time inference. Receives a list with feature values, and return the predicted price.
+* endpoint '/predict_batch': performs inference on many samples at the same time, so it can be used for batch prediction. Receives a Pandas dataframe with the samples, and returns a Pandas series with predicted prices.
+
+The app can be ran with '''uvicorn app:app --host 0.0.0.0 --port 8000'''
