@@ -11,6 +11,9 @@ notas.txt
 /model_registry
 
 
+/metrics
+/model_registry
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
