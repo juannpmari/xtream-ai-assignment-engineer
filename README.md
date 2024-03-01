@@ -92,3 +92,4 @@ It's exposes two endpoints:
 * endpoint '/predict_batch': performs inference on many samples at the same time, so it can be used for batch prediction. Receives a Pandas dataframe with the samples, and returns a Pandas series with predicted prices.
 
 The app can be ran with '''uvicorn app:app --host 0.0.0.0 --port 8000'''
+http://localhost:8000/docs
