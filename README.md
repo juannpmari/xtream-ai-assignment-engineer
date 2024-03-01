@@ -83,3 +83,24 @@ So, ready to add some sparkle to this challenge? Let's make these diamonds shine
 
 ## How to run
 Please fill this section as part of the assignment.
+
+## Architectural notes
+
+#### Challenge 1
+#### Challenge 2
+The automated training pipeline is composed of a preprocessing step and a training step.
+The preprocessing cleans and prepare the data through:
+* data validation: checks for ilogical values (such as negative dimensions or price), and discards these rows
+* data encoding: in order to leverage categorical features, they are encoded into numerical values using ordinal enconding. This can be done due to the features having ordinal order.
+* data scaling: it's not necessary for regression trees, but it is for linear regression
+* data splitting: divide the dataset into train and test splits.
+The output of this step is the splitted dataset, which is saved to a local directory. Ideally, it could be saved to a cloud storage and versioned with DVC or similar tools.
+The training step loads the latest preprocessed data, trains a model and evaluates it. The model weights are exported in .pt format for deployment, and are saved locally that simulates a model registry. Ideally, they would be saved to a real model registry with functionality for model versioning.
+Metrics are saved to a .txt file. They should be tracked with experiment tracking tools, such as WandB.
+
+For the sake of the exercise, the pipeline is scheduled for execution with a fixed frecuency. It checks for new data and, if found, runs and returns a new, fresh model. In a more complex scenario, with new data being continously stored in a data lake, a performance-based trigger could be set, so that the retraining launches whenever a certain metric goes below a threshold. This setup requires an according monitoring infrastructure.
+
+The pipeline is executed inside a Docker container. Another consideration is that instead of having all the pipeline inside one container, it could be splitted in several microservices to gain more flexibility and maintanibility, but this would imply the use of an orchestration tool, such as Airflow.
+
+#### Challenge 3
+#### Challenge 4

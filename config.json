@@ -1,0 +1,7 @@
+{
+    "categorical_variables":{
+        "cut":[["Ideal", "Premium", "Very Good", "Good", "Fair"]],
+        "color":[["D","E","F","G","H","I","J"]],
+        "clarity":[["IF","VVS1", "VVS2","VS1","VS2","SI1","SI2","I1"]]
+    }
+}
