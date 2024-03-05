@@ -1,20 +1,19 @@
 services:
   training-pipeline:
     image: training_pipeline:latest
-    container_name: training_pipeline
+    container_name: training-pipeline
     volumes:
-      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/datasets:/datasets
-      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/model_registry:/model_registry
-      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/metrics:/metrics
-      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/config.json:/app/config.json
-
+      - ./datasets:/datasets
+      - ./model_registry:/model_registry
+      - ./metrics:/metrics
+      - ./config.json:/app/config.json
     command: tail -f /dev/null
 
   model-serving:
     image: model-serving:latest
     container_name: model-serving
     volumes:
-      - C:/Users/jpabl/OneDrive/Documentos/xtream-ai-assignment-engineer/model_registry:/model_registry
+      - ./model_registry:/model_registry
     command: tail -f /dev/null
     ports: 
       - 8000:8000
