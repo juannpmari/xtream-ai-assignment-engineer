@@ -2,17 +2,8 @@ notas.txt
 *.pt
 *.pkl
 *.png
-
-notas.txt
-*.pt
-*_tree.png
 /datasets
-/metrics
-/model_registry
-
-
-/metrics
-/model_registry
+*.docx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
