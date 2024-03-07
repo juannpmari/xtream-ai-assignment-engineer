@@ -11,12 +11,13 @@ logger = logging.getLogger(__name__)
 
 class Preprocessor():
     
-    def __init__(self,config):
+    def __init__(self,config,date):
         logging.info("Initializing preprocessor")
         self.config = config
-        self.data_path = Path(config['preprocessing']['data_path'],'diamonds.csv')
-        self.current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        self.output_path = f"{config['preprocessing']['output_path']}/data_{self.current_time}"
+        self.data_path = Path(config['preprocessing']['data_path'],f'diamonds_{date}.csv')
+        # self.current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        self.date = date
+        self.output_path = f"{config['preprocessing']['output_path']}/data_{self.date}"
         os.makedirs(self.output_path,exist_ok=True)
         self.categorical_variables = config['preprocessing']['categorical_variables']
     
@@ -64,7 +65,7 @@ class Preprocessor():
             y_train.to_csv(Path(self.output_path,f'y_train.csv'), index=False)
             y_test.to_csv(Path(self.output_path,f'y_test.csv'), index=False)
             logging.info("Finished preprocessing data")
-            return self.current_time
+            # return self.current_time
         except Exception as e:
             logging.error("Error performing train/test split: ",e)
 
@@ -73,5 +74,6 @@ class Preprocessor():
         self.data_validation()
         self.encode_data()
         self.scale_data()
-        current_time = self.split_data()
-        return current_time
+        self.split_data()
+        # current_time = self.split_data()
+        # return current_time
