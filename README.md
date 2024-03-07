@@ -84,19 +84,25 @@ So, ready to add some sparkle to this challenge? Let's make these diamonds shine
 ## How to run
 Please fill this section as part of the assignment.
 
-## Architectural notes
+Challenge 1 is addressed in model_dev.ipynb, which can be run inside a virtual environment
+
+Challenges 2 and 3 were completed each in a separate Docker container, both managed by docker-compose.yaml. It can be run with 'docker-compose up -d'
+
+## Notes
 
 #### Challenge 1
+Each section of the notebook has comments and markdown text, so there's not much to add here
+
 #### Challenge 2
-The automated training pipeline is composed of a preprocessing step and a training step.
+The automated training pipeline consists of preprocessing, training and evaluation steps.
+
 The preprocessing cleans and prepare the data through:
-* data validation: checks for ilogical values (such as negative dimensions or price), and discards these rows
+* data validation: checks for ilogical values (such as negative dimensions or price), and discards these rows.
 * data encoding: in order to leverage categorical features, they are encoded into numerical values using ordinal enconding. This can be done due to the features having ordinal order.
-* data scaling: it's not necessary for regression trees, but it is for linear regression
-* data splitting: divide the dataset into train and test splits.
-The output of this step is the splitted dataset, which is saved to a local directory. Ideally, it could be saved to a cloud storage and versioned with DVC or similar tools.
-The training step loads the latest preprocessed data, trains a model and evaluates it. The model weights are exported in .pt format for deployment, and are saved locally that simulates a model registry. Ideally, they would be saved to a real model registry with functionality for model versioning.
-Metrics are saved to a .txt file. They should be tracked with experiment tracking tools, such as WandB.
+* data scaling: considering that each feature has a different scale and range of values, it's convenient to scale them to make them more comparable to each other. While min-max scaling is very popular, it's more sensitive to outliers, so z-score scaling was the chosen method, which consists of transforming each feature so that it has mean=0 and std=1.
+* data splitting: divide the dataset into train and test splits. The output of this step is the splitted dataset, which is saved to a local directory. Ideally, it could be saved to a cloud storage and versioned with DVC or similar tools.
+
+The training step loads the latest preprocessed data, trains a model and evaluates it. As concluded in the challenge 1 notebook, a regression tree was chosen, though the pipeline architecture was designed to very easily allow for other models to be trained. The model weights are exported in .pt format for deployment, and are saved locally to a directory that simulates a model registry. Ideally, they would be saved to a real model registry with functionality for model versioning. Metrics are saved to a .txt file. They should be tracked with experiment tracking tools, such as WandB.
 
 For the sake of the exercise, the pipeline is scheduled for execution with a fixed frecuency. It checks for new data and, if found, runs and returns a new, fresh model. In a more complex scenario, with new data being continously stored in a data lake, a performance-based trigger could be set, so that the retraining launches whenever a certain metric goes below a threshold. This setup requires an according monitoring infrastructure.
 
