@@ -7,7 +7,7 @@ services:
       - ./model_registry:/model_registry
       - ./metrics:/metrics
       - ./config.json:/app/config.json
-    command: tail -f /dev/null
+    # command: tail -f /dev/null
 
   model-serving:
     image: model-serving:latest
