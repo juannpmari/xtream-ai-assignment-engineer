@@ -1,7 +1,12 @@
 {
     "preprocessing":{
         "data_path":"/datasets/diamonds",
-        "output_path":"/datasets/diamonds/processed_data"  
+        "output_path":"/datasets/diamonds/processed_data",
+        "categorical_variables":{
+            "cut":[["Ideal", "Premium", "Very Good", "Good", "Fair"]],
+            "color":[["D","E","F","G","H","I","J"]],
+            "clarity":[["IF","VVS1", "VVS2","VS1","VS2","SI1","SI2","I1"]]
+        }
     },
     "training":{
         "model_output_path":"/model_registry",
@@ -10,11 +15,6 @@
             "min_samples_split": 10, 
             "min_samples_leaf": 4
         }
-    },
-    "categorical_variables":{
-        "cut":[["Ideal", "Premium", "Very Good", "Good", "Fair"]],
-        "color":[["D","E","F","G","H","I","J"]],
-        "clarity":[["IF","VVS1", "VVS2","VS1","VS2","SI1","SI2","I1"]]
     }
     
 }
