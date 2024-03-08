@@ -110,12 +110,33 @@ For this to work, each new .csv should be named like 'diamonds_2024-03-07-04-17-
 The pipeline is executed inside a Docker container that's continously up. Another consideration is that instead of having all the pipeline inside one container, it could be splitted in several microservices to gain more flexibility and maintanibility, but this would imply the use of an orchestration tool, such as Airflow.
 
 #### Challenge 3
-A RESTful API was created using FastAPI. It loads the latest model from the local directory 'model_registry', and deploys it for inference using PyTorch.
-It's exposes two endpoints:
-* endpoint '/predict': processes one input at a time, so it can be used for real time inference. Receives a list with feature values, and return the predicted price.
-* endpoint '/predict_batch': performs inference on many samples at the same time, so it can be used for batch prediction. Receives a Pandas dataframe with the samples, and returns a Pandas series with predicted prices.
+A RESTful API was created using FastAPI. It loads the latest model from the local directory 'model_registry', and deploys it for inference using PyTorch. In can be accesed on http://localhost:8000/docs
+It has one endpoint '/predict' that can be used both for real-time prediction (one sample at a time) or for batch prediction. It expects a list of dictionaries, each with the raw features of a diamond, i.e.,
+[
+  {
+    "carat": 0,
+    "cut": 0,
+    "color": 0,
+    "clarity": 0,
+    "depth": 0,
+    "table": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  {
+    ...
+  }
+]
+
+It performs the same preprocessing steps defined for training pipeline, and returns a dict with predictes prices as a list:
+{
+  "msg": "Diamond price predicted succesfully",
+  "pred_prices": "[530.0, 17329.0]"
+}
+
 
 The app can be ran with '''uvicorn app:app --host 0.0.0.0 --port 8000'''
-http://localhost:8000/docs
+
 
 #### Challenge 4

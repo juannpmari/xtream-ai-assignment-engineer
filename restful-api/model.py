@@ -6,7 +6,9 @@ from pathlib import Path
 class RegressionTreeModel(torch.nn.Module):
     def __init__(self,model_name):
         super(RegressionTreeModel, self).__init__()
-        self.tree = joblib.load(Path('model_registry',model_name))
+        self.tree = joblib.load(Path('/model_registry',model_name))
 
     def forward(self, x):
         return torch.tensor(self.tree.predict(x))
+
+
