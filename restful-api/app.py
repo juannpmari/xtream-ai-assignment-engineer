@@ -31,7 +31,7 @@ def get_latest_model():
     latest_model = f"tree_reg_model_{most_recent_date}"
     logging.info(f"Loaded model {latest_model}")
     global model
-    model = RegressionTreeModel(latest_model)
+    model = RegressionTreeModel(latest_model,directory)
 
 latest_model = get_latest_model()
 
@@ -53,9 +53,17 @@ def predict(diamonds:List[Diamond]):
     for diamond in diamonds:
         diamond_dict_list.append(diamond.dict())
     diamonds_df = pd.DataFrame(diamond_dict_list)
-    diamonds_df_proc = Preprocessor(config,diamonds_df)()
-    predictions = model(diamonds_df_proc)
-    return {
-        "msg": "Diamond price predicted succesfully",
-        "pred_prices": str([pred.item() for pred in predictions])
-    }
+    
+    try:
+        diamonds_df_proc = Preprocessor(config,diamonds_df)()
+        predictions = model(diamonds_df_proc)
+        return {
+            "msg": "Diamond price predicted succesfully",
+            "pred_prices": str([pred.item() for pred in predictions])
+        }
+    except Exception as e:
+        logging.error("Error making predictions")
+        return {
+            "msg": f"An error ocurred: {e}",
+            "pred_prices": "[]"
+        }
