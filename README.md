@@ -91,7 +91,7 @@ Challenges 2 and 3 were completed each in a separate Docker container, both mana
 ## Notes
 
 #### Challenge 1
-Each section of the notebook has comments and markdown text, so there's not much to add here
+Each section of the notebook has comments and markdown text, so there's not much to add here.
 
 #### Challenge 2
 The automated training pipeline consists of preprocessing, training and evaluation steps.
@@ -109,20 +109,39 @@ For this to work, each new .csv should be named like 'diamonds_2024-03-07-04-17-
 
 The pipeline is executed inside a Docker container that's continously up. Another consideration is that instead of having all the pipeline inside one container, it could be splitted in several microservices to gain more flexibility and maintanibility, but this would imply the use of an orchestration tool, such as Airflow.
 
+The pipeline gets configuration parameters from config.json, from sections "preprocessing" and "training". These parameters are:
+"preprocessing":{
+        "data_path":"/datasets/diamonds", #path to raw data directory
+        "output_path":"/datasets/diamonds/processed_data", #where the processed data will be saved
+        "categorical_variables":{ #for the ordinal categorical variables, we need to set the correct order for later encoding
+            "cut":[["Ideal", "Premium", "Very Good", "Good", "Fair"]],
+            "color":[["D","E","F","G","H","I","J"]],
+            "clarity":[["IF","VVS1", "VVS2","VS1","VS2","SI1","SI2","I1"]]
+        }
+    },
+    "training":{
+        "model_output_path":"/model_registry", #where models weights will be saved. It should ideally be a real model registry
+        "metrics_output_path":"/metrics", #Where a .txt file with resulting metrics is saved
+        "reg_tree_hyperparameters":{ #These where obtained during hyperparameter tuning in challenge 1
+            "min_samples_split": 10, 
+            "min_samples_leaf": 4
+        }
+    },
+
 #### Challenge 3
 A RESTful API was created using FastAPI. It loads the latest model from the local directory 'model_registry', and deploys it for inference using PyTorch. In can be accesed on http://localhost:8000/docs
 It has one endpoint '/predict' that can be used both for real-time prediction (one sample at a time) or for batch prediction. It expects a list of dictionaries, each with the raw features of a diamond, i.e.,
 [
   {
-    "carat": 0,
-    "cut": 0,
-    "color": 0,
-    "clarity": 0,
-    "depth": 0,
-    "table": 0,
-    "x": 0,
-    "y": 0,
-    "z": 0
+    "carat": float,
+    "cut": str,
+    "color": str,
+    "clarity": str,
+    "depth": float,
+    "table": float,
+    "x": float,
+    "y": float,
+    "z": float
   },
   {
     ...
@@ -134,7 +153,12 @@ It performs the same preprocessing steps defined for training pipeline, and retu
   "msg": "Diamond price predicted succesfully",
   "pred_prices": "[530.0, 17329.0]"
 }
+It reads some configuration parameters from the same .json file as the rest of the code, from section 'deployment'. An important detail is that we need to add manually the mean and standard deviation for the scaler, that are obtained during model training, to ensure that exactly the same transformations are applied during training and deployment. In the future, these values should be saved automatically during the execution of the training pipeline. For example,
 
+"deployment":{
+        "scaler_mean":[0.79411706,  1.09941872,  2.60753658 , 3.94086991, 61.71084386, 57.44624173,5.72623171,  5.72882141,  3.53367809],
+        "scaler_std":[0.4679341 , 1.12201036 ,1.69109518 ,1.63173802 ,1.44541793 ,2.2595257,1.11614527, 1.10905561, 0.68836804]
+    }
 
 The app can be ran with '''uvicorn app:app --host 0.0.0.0 --port 8000'''
 
