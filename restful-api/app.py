@@ -8,22 +8,21 @@ import logging
 import numpy as np
 import pandas as pd
 from typing import List
+from preprocessing import Preprocessor
+import json
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Create an instance of the FastAPI class
+
+config_path = 'config.json'
+with open(config_path, 'r') as file:
+    config = json.load(file)
+
 app = FastAPI()
 
 def get_latest_model():
     logging.info("Getting latest model")
-    
-    # models = os.listdir('/model_registry')
-    # models_dates = [datetime.strptime(model.split('_')[-1], '%Y-%m-%d-%H-%M-%S') for model in models]
-    # latest_model_index = models_dates.index(max(models_dates))
-    # latest_model = models[latest_model_index] if models else None
-    # logging.info(f"Using model {latest_model}")
-
-    directory = '/model_registry'#config['preprocessing']['data_path']
+    directory = config['training']['model_output_path']
     models = os.listdir(directory)
     filtered_files = [f for f in models if f.startswith('tree_')]
     dates = [f.split('_')[-1] for f in filtered_files]
@@ -38,9 +37,9 @@ latest_model = get_latest_model()
 
 class Diamond(BaseModel):
     carat:float
-    cut:int
-    color:int     
-    clarity:int  
+    cut:str
+    color:str     
+    clarity:str  
     depth:float  
     table:float   
     x:float    
@@ -50,16 +49,13 @@ class Diamond(BaseModel):
 @app.post("/predict")
 def predict(diamonds:List[Diamond]):
     logging.info("Running prediction...")
-    
     diamond_dict_list=[]
     for diamond in diamonds:
         diamond_dict_list.append(diamond.dict())
     diamonds_df = pd.DataFrame(diamond_dict_list)
-    predictions = model(diamonds_df)
-  
+    diamonds_df_proc = Preprocessor(config,diamonds_df)()
+    predictions = model(diamonds_df_proc)
     return {
         "msg": "Diamond price predicted succesfully",
         "pred_prices": str([pred.item() for pred in predictions])
     }
-
-# uvicorn app:app --host 0.0.0.0 --port 8000

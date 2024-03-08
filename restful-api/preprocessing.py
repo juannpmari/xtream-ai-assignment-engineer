@@ -11,22 +11,12 @@ logger = logging.getLogger(__name__)
 
 class Preprocessor():
     
-    def __init__(self,config,date):
+    def __init__(self,config,diamonds_df):
         logging.info("Initializing preprocessor")
-        self.config = config
-        self.data_path = Path(config['preprocessing']['data_path'],f'diamonds_{date}.csv')
-        # self.current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        self.date = date
-        self.output_path = f"{config['preprocessing']['output_path']}/data_{self.date}"
-        os.makedirs(self.output_path,exist_ok=True)
+        self.diamonds_df = diamonds_df
         self.categorical_variables = config['preprocessing']['categorical_variables']
-    
-    def load_data(self):
-        '''Load raw data'''
-        try:
-            self.diamonds_df = pd.read_csv(self.data_path)
-        except Exception as e:
-            logging.error("Error loading raw data: ",e)
+        self.scaler_mean = config['deployment']['scaler_mean']
+        self.scaler_std = config['deployment']['scaler_std']
 
     def data_validation(self):
         '''Checks that all rows have valid values. Numerical magnitudes represent the price and physical properties that must be >0'''
@@ -45,35 +35,19 @@ class Preprocessor():
     def scale_data(self):
         '''Scale all features (except target) using z-score scaling'''
         try:
-            columns_to_scale = self.diamonds_df.columns[self.diamonds_df.columns != 'price']
+            columns_to_scale = self.diamonds_df.columns
             scaler = StandardScaler()
-            scaler.fit(self.diamonds_df[columns_to_scale])
+            scaler.mean_ = self.scaler_mean
+            scaler.scale_ = self.scaler_std
             scaled_data = scaler.transform(self.diamonds_df[columns_to_scale])
             scaled_df = pd.DataFrame(scaled_data, columns=columns_to_scale)
-            self.scaled_df_x = scaled_df
+            self.scaled_df = scaled_df
         except Exception as e:
             logging.error("Error scaling data: ",e)
  
-    def split_data(self):
-        '''Split processed data into train and test sets, and them to output_path'''
-        try:
-            X = self.scaled_df_x
-            y = self.diamonds_df['price']
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-            X_train.to_csv(Path(self.output_path,f'X_train.csv'), index=False)
-            X_test.to_csv(Path(self.output_path,f'X_test.csv'), index=False)
-            y_train.to_csv(Path(self.output_path,f'y_train.csv'), index=False)
-            y_test.to_csv(Path(self.output_path,f'y_test.csv'), index=False)
-            logging.info("Finished preprocessing data")
-            # return self.current_time
-        except Exception as e:
-            logging.error("Error performing train/test split: ",e)
 
     def __call__(self):
-        self.load_data()
         self.data_validation()
         self.encode_data()
         self.scale_data()
-        self.split_data()
-        # current_time = self.split_data()
-        # return current_time
+        return self.scaled_df
