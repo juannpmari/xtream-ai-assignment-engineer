@@ -1,8 +1,6 @@
 notas.txt
-*.pt
 *.pkl
 *.png
-/datasets
 *.docx
 /venv
 

@@ -89,37 +89,37 @@ It's addressed in `challenge1_notebook.ipynb`. It can be run using any code edit
 * `python -m venv venv`
 
 #### Challenges 2 and 3
-The code corresponding to challenges 2 can be found in `./training_pipeline`, while that for challenge 3 is in `./restful-api`. All the code was containerized using Docker to make it simpler for the final user to run it, each in a separate container, and both managed by `docker-compose.yaml`. To run it, follow these steps:
-* Build both docker images: each of de mentioned directories has a dockerfile. It may take a while due to the packages being installed
-  * inside `./training_pipeline`, run `docker build training_pipeline:latest .`
-  * inside `./restful-api`, run `model-serving:latest`
+The code corresponding to challenges 2 can be found in `./training_pipeline`, while that for challenge 3 is in `./restful-api`. All the code was containerized using Docker to make it simple to run for the final user, each in a separate container, and both managed by `docker-compose.yaml`. To run it, follow these steps:
+* Build both docker images: each of the mentioned directories has a dockerfile. It may take a while due to the packages being installed
+  * inside `./training_pipeline`, run `docker build -t training_pipeline:latest .`
+  * inside `./restful-api`, run `docker build -t model-serving:latest .`
 * Once both images are built, run `docker-compose up -d` to start the containers.
 * Important bind mounts:
-  * `./datasets` is the directory where the raw .csv file is stored
-  * `./model_registry` is where the output model weights will be stored, simulating a model registry
-  * `./metrics` is where training metrics (MAE) will be stored for evaluation
-  * `config.json` is a config file with many important parameters explained below.
+  * `./datasets` is the directory where raw .csv files are stored.
+  * `./model_registry` is where the output model weights are stored, simulating a model registry.
+  * `./metrics` is where training metrics (MAE) are stored for evaluation.
+  * `config.json` is a config file with some important parameters explained below.
 * Content of the config file `config.json`: it contains 3 main sections, for each step of the ML lifecycle
   * `preprocessing`:
-    * `data_path`:`/datasets/diamonds` -> path to raw data
-    * `output_path`:`/datasets/diamonds/processed_data`, -> path where preprocessed data will be stored
-    * `categorical_variables`:{ -> it encodes the categories and order of each categorical variable (cut, color and clarity)
+    * `data_path`:`/datasets/diamonds` -> path to raw data.
+    * `output_path`:`/datasets/diamonds/processed_data`, -> path where preprocessed data is stored.
+    * ```categorical_variables:{
             "cut":[["Ideal", "Premium", "Very Good", "Good", "Fair"]],
             "color":[["D","E","F","G","H","I","J"]],
             "clarity":[["IF","VVS1", "VVS2","VS1","VS2","SI1","SI2","I1"]]
-        }
+        }``` -> it encodes the categories and order of each categorical variable (cut, color and clarity).
   * `training`:
-    * `model_output_path`:`/model_registry`, -> where the model weights are stored (path inside the container)
-    * `metrics_output_path`:`/metrics`, -> where the training metrics are stored (path inside the container)
-    * `reg_tree_hyperparameters`:{ -> hyperparameters for the tree regressor, as calculated in challenge 1
-            `min_samples_split`: 10, 
-            `min_samples_leaf`: 4
-        }
-  * `deployment`: during the preprocessing step in model training, training data is used to fit a z-score scaler. So at deployment time, the exact same parameters must be used for the scaler, to ensure coherence between training and inference pipelines
-    * `scaler_mean`:[0.79411706,  1.09941872,  2.60753658 , 3.94086991, 61.71084386, 57.44624173,5.72623171,  5.72882141,  3.53367809],
-    * `scaler_std`:[0.4679341 , 1.12201036 ,1.69109518 ,1.63173802 ,1.44541793 ,2.2595257,1.11614527, 1.10905561, 0.68836804]
+    * `model_output_path`:`/model_registry`, -> where the model weights are stored (path inside the container).
+    * `metrics_output_path`:`/metrics`, -> where the training metrics are stored (path inside the container).
+    * ```reg_tree_hyperparameters:{ 
+            min_samples_split: 10, 
+            min_samples_leaf: 4
+        }``` -> hyperparameters for the regression tree, as calculated during hyperparameter tuning in challenge 1.
+  * `deployment`: during the preprocessing step in model training, training data is used to fit a StandardScaler. So at deployment time, the exact same parameters must be used for the scaler, to ensure coherence between training and inference pipelines
+    * `scaler_mean:[0.79411706,  1.09941872,  2.60753658 , 3.94086991, 61.71084386, 57.44624173,5.72623171,  5.72882141,  3.53367809]`
+    * `scaler_std:[0.4679341 , 1.12201036 ,1.69109518 ,1.63173802 ,1.44541793 ,2.2595257,1.11614527, 1.10905561, 0.68836804]`
     
-## Extra notes and code details
+## Code details and extra notes
 
 #### Challenge 2
 The automated training pipeline consists of preprocessing, training and evaluation steps.
@@ -133,15 +133,15 @@ The preprocessing cleans and prepare the data through:
 The training step loads the latest preprocessed data, trains a model and evaluates it. As concluded in the challenge 1 notebook, a regression tree was chosen, though the pipeline architecture was designed to very easily allow for other models to be trained. The model weights are exported in .pt format for deployment, and are saved locally to a directory that simulates a model registry. Ideally, they would be saved to a real model registry with functionality for model versioning. Metrics are saved to a .txt file. They could be tracked with experiment tracking tools, such as WandB.
 
 For the sake of the exercise, the pipeline is scheduled for execution with a fixed frecuency (for this example, every 50 minutes), which it should be stablished based on how often new data becomes available. With every execution, the code checks if there's new data available (assuming the .csv are named with their creation date) and, if found, runs and returns a new, fresh model, along with it's evaluation metrics. In a more complex scenario, with new data being continously stored in a data lake, a performance-based trigger could be set, so that the retraining launches whenever a certain metric goes below a threshold. This setup requires an according monitoring infrastructure.
-The pipeline code expects each new .csv to be named like 'diamonds_2024-03-07-04-17-03.csv'.
+The pipeline code expects each new .csv to be named like `diamonds_2024-03-07-04-17-03.csv`.
 
 The pipeline is executed inside a unique Docker container. In order to to gain more flexibility and maintanibility, instead of having all the pipeline inside one container, it could be splitted in several independent microservices, but this would require the use of an orchestration tool, such as Airflow.
 
-After training, a validation step could be set for continuos deployment, which verifies that the new models performs better than the current one. Once deployed, there are many online testing strategies available to minimize the risk of the new model performing badly in production.
+After training, a validation step could be set for continuous deployment, which verifies that the new models performs better than the current one. Once deployed, there are many online testing strategies available to minimize the risk of the new model performing badly in production.
 
 #### Challenge 3
-A RESTful API was created using FastAPI. It loads the latest model from the local directory 'model_registry', and deploys it for inference using PyTorch. In can be accesed on `http://localhost:8000/docs`
-It exposes one endpoint `/predict` that can be used both for real-time prediction (one sample at a time) or for batch prediction. It expects a list of dictionaries, each with the raw features of a diamond:
+A RESTful API was created using FastAPI. It loads the latest model from the local directory `model_registry`, and deploys it for inference using PyTorch. In can be accesed on `http://localhost:8000/docs`
+It exposes one endpoint `/predict` that can be used both for real-time prediction (one sample at a time) or for batch prediction. AS input, tt expects a list of dictionaries, each with the raw features of a diamond:
 ```
 [
   {
@@ -168,8 +168,8 @@ It performs the same preprocessing steps defined for training pipeline, and retu
   "pred_prices": "[530.0, 17329.0]"
 }
 ```
-An important detail is that,as explained above, we need to add manually the mean and standard deviation for the scaler, that are obtained during model training, to ensure that exactly the same transformations are applied during training and deployment. In the future, these values should be saved automatically during the execution of the training pipeline.
-In case of running the server manually (it should be necessary as the dockerfile runs it automatically), you need to run `uvicorn app:app --host 0.0.0.0 --port 8000`.
+An important detail is that,as explained above, we need to manually add the mean and standard deviation for the scaler to the config file, which are obtained during model training, to ensure that the exact same transformations are applied during training and deployment. In the future, these values should be saved automatically during the execution of the training pipeline.
+In case of running the server manually (it shouldn't be necessary as the dockerfile runs it automatically), you need to run `uvicorn app:app --host 0.0.0.0 --port 8000`.
 
 #### Challenge 4
 Please refer to `challenge4.pdf`.
